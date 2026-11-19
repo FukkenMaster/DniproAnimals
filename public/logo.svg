@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Логотип притулку">
+  <rect width="64" height="64" rx="16" fill="#FFB72B"/>
+  <circle cx="50" cy="14" r="9" fill="#FFE61B"/>
+  <path d="M14 24 L15 10 L28 19 Z" fill="#1F1F1F"/>
+  <path d="M50 24 L49 10 L36 19 Z" fill="#1F1F1F"/>
+  <path d="M32 17c-10.5 0-18 7.5-18 17.5C14 46 21.5 53 32 53s18-7 18-18.5C50 24.5 42.5 17 32 17z" fill="#1F1F1F"/>
+  <circle cx="24.5" cy="32.5" r="2.4" fill="#B5FE83"/>
+  <circle cx="39.5" cy="32.5" r="2.4" fill="#B5FE83"/>
+  <path d="M28.5 38h7L32 42.5z" fill="#FFB72B"/>
+  <path d="M21.5 41.5h-8M21.5 45.5h-9M42.5 41.5h8M42.5 45.5h9" stroke="#FFB72B" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

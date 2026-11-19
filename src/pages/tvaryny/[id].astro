@@ -1,0 +1,140 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { animalPage, labels } from '../../config';
+import { formatAge, formatDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const animals = await getCollection('animals');
+  return animals.map((animal) => ({
+    params: { id: animal.id },
+    props: { animal },
+  }));
+}
+
+interface Props {
+  animal: CollectionEntry<'animals'>;
+}
+
+const { animal } = Astro.props;
+const { Content } = await render(animal);
+const { name, sex, ageMonths, breed, status, photos, traits, intakeDate } = animal.data;
+
+const sexLabel = labels.sex[sex];
+const statusLabel = labels.status[status];
+const ageLabel = formatAge(ageMonths);
+const pageDescription = animal.data.summary;
+const contactHref = `/kontakt/?tvaryna=${encodeURIComponent(name)}#forma`;
+---
+
+<Base title={`${name} — ${sexLabel.toLowerCase()}, ${ageLabel}`} description={pageDescription}>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Навігаційний ланцюжок">
+        <a href="/">Головна</a>
+        <span aria-hidden="true">/</span>
+        <a href="/tvaryny/">{animalPage.backLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{name}</span>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container animal-detail">
+      <div class="animal-media">
+        <div class="animal-photo">
+          <img
+            src={photos[0]}
+            alt={`${name} — ${breed.toLowerCase()}`}
+            width="800"
+            height="600"
+            fetchpriority="high"
+          />
+        </div>
+        {
+          photos.length > 1 && (
+            <div class="animal-photos-extra">
+              {photos.slice(1).map((photo, index) => (
+                <div class="animal-photo">
+                  <img
+                    src={photo}
+                    alt={`${name} — додаткове фото ${index + 2}`}
+                    width="800"
+                    height="600"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="animal-info">
+        <span class:list={['badge', `badge--${status}`]}>{statusLabel}</span>
+        <h1>{name}</h1>
+        <p class="animal-card-meta">{sexLabel} · {breed}</p>
+
+        <dl class="animal-meta">
+          <div>
+            <dt>{animalPage.labels.breed}</dt>
+            <dd>{breed}</dd>
+          </div>
+          <div>
+            <dt>{animalPage.labels.sex}</dt>
+            <dd>{sexLabel}</dd>
+          </div>
+          <div>
+            <dt>{animalPage.labels.age}</dt>
+            <dd>{ageLabel}</dd>
+          </div>
+          <div>
+            <dt>{animalPage.labels.arrived}</dt>
+            <dd>{formatDate(intakeDate)}</dd>
+          </div>
+        </dl>
+
+        {
+          traits.length > 0 && (
+            <>
+              <h2>{animalPage.traitsTitle}</h2>
+              <ul class="traits">
+                {traits.map((trait) => <li class="trait">{trait}</li>)}
+              </ul>
+            </>
+          )
+        }
+
+        <h2>{animalPage.aboutTitle}</h2>
+        <div class="prose">
+          <Content />
+        </div>
+
+        {
+          status === 'adopted' ? (
+            <div class="animal-cta animal-cta--adopted">
+              <h2>{statusLabel}</h2>
+              <p>{animalPage.adoptedNote}</p>
+              <a class="btn btn--dark" href="/tvaryny/">
+                {animalPage.adoptedCta}
+                <Icon name="arrow-right" size={18} />
+              </a>
+            </div>
+          ) : (
+            <div class="animal-cta">
+              <h2>{animalPage.ctaTitle}</h2>
+              <p>{animalPage.ctaText}</p>
+              <a class="btn btn--dark" href={contactHref}>
+                {animalPage.ctaButton}
+                <Icon name="arrow-right" size={18} />
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Base>

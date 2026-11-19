@@ -1,0 +1,78 @@
+---
+import Icon from './Icon.astro';
+import {
+  contacts,
+  emailHref,
+  footer,
+  navigation,
+  phoneHref,
+  siteConfig,
+} from '../config';
+
+const year = new Date().getFullYear();
+const socialIcons: Record<string, 'instagram' | 'facebook'> = {
+  Instagram: 'instagram',
+  Facebook: 'facebook',
+};
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand brand--footer" href="/">
+          <img class="brand-logo" src={siteConfig.logo} alt="" width="46" height="46" />
+          <span class="brand-name">{siteConfig.shortName}</span>
+        </a>
+        <p>{footer.tagline}</p>
+      </div>
+
+      <div>
+        <h2 class="footer-title">{footer.navTitle}</h2>
+        <ul class="footer-links">
+          {
+            navigation.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="footer-contact">
+        <h2 class="footer-title">{footer.contactsTitle}</h2>
+        <address>
+          {contacts.addressLines.map((line) => <span>{line}<br /></span>)}
+        </address>
+        <a href={phoneHref}>{contacts.phone}</a>
+        <br />
+        <a href={emailHref}>{contacts.email}</a>
+        <br />
+        <a href={contacts.mapUrl} target="_blank" rel="noopener noreferrer">
+          {contacts.mapLabel}
+        </a>
+      </div>
+
+      <div>
+        <h2 class="footer-title">{footer.socialTitle}</h2>
+        <ul class="footer-social">
+          {
+            contacts.social.map((item) => (
+              <li>
+                <a href={item.url} target="_blank" rel="noopener noreferrer">
+                  <Icon name={socialIcons[item.label] ?? 'heart'} size={18} />
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© {year} {siteConfig.name}. {footer.note}</p>
+    </div>
+  </div>
+</footer>

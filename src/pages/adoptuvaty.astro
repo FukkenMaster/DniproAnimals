@@ -1,0 +1,90 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { adoption, home } from '../config';
+---
+
+<Base title="Як адоптувати" description={adoption.intro}>
+  <section class="page-hero">
+    <div class="container">
+      <span class="eyebrow">{adoption.eyebrow}</span>
+      <h1>{adoption.title}</h1>
+      <p class="page-hero-text">{adoption.intro}</p>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <h2>{adoption.stepsTitle}</h2>
+      <ol class="steps-list steps-list--four" style="margin-top: 1.5rem">
+        {
+          adoption.steps.map((step, index) => (
+            <li class="step-card">
+              <span class="step-number" aria-hidden="true">{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container split-grid">
+      <div class="content-card">
+        <h2>{adoption.requirementsTitle}</h2>
+        <ul class="check-list">
+          {adoption.requirements.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+      <div class="content-card">
+        <h2>{adoption.feesTitle}</h2>
+        <p class="section-text" style="margin-top: 0; margin-bottom: 1.25rem">{adoption.feesText}</p>
+        <ul class="fees">
+          {
+            adoption.fees.map((fee) => (
+              <li>
+                <span>{fee.label}</span>
+                <strong>{fee.value}</strong>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <h2 style="margin-bottom: 1.5rem">{adoption.faqTitle}</h2>
+      <div class="faq">
+        {
+          adoption.faq.map((item) => (
+            <details>
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="cta-banner">
+        <div>
+          <h2>{home.cta.title}</h2>
+          <p>{home.cta.text}</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn--dark" href={home.cta.primary.href}>
+            {home.cta.primary.label}
+            <Icon name="arrow-right" size={18} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

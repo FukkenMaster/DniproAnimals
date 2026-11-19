@@ -1,0 +1,182 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { contactPage, contacts, emailHref, phoneHref } from '../config';
+
+const socialIcons: Record<string, 'instagram' | 'facebook'> = {
+  Instagram: 'instagram',
+  Facebook: 'facebook',
+};
+---
+
+<Base title="Контакти" description={contactPage.text}>
+  <section class="page-hero">
+    <div class="container">
+      <span class="eyebrow">{contactPage.eyebrow}</span>
+      <h1>{contactPage.title}</h1>
+      <p class="page-hero-text">{contactPage.text}</p>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container contact-grid">
+      <div>
+        <div class="contact-card">
+          <h2>{contactPage.detailsTitle}</h2>
+          <ul class="contact-list">
+            <li>
+              <Icon name="phone" size={20} />
+              <div>
+                <span>{contactPage.details.phone}</span>
+                <a href={phoneHref}><strong>{contacts.phone}</strong></a>
+              </div>
+            </li>
+            <li>
+              <Icon name="mail" size={20} />
+              <div>
+                <span>{contactPage.details.email}</span>
+                <a href={emailHref}><strong>{contacts.email}</strong></a>
+              </div>
+            </li>
+            <li>
+              <Icon name="pin" size={20} />
+              <div>
+                <span>{contactPage.details.address}</span>
+                <strong>{contacts.addressLines.join(', ')}</strong>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="map-card">
+          <Icon name="pin" size={30} />
+          <p>{contacts.addressLines.join(', ')}</p>
+          <a class="btn" href={contacts.mapUrl} target="_blank" rel="noopener noreferrer">
+            {contacts.mapLabel}
+            <Icon name="arrow-right" size={18} />
+          </a>
+        </div>
+
+        <div class="contact-card" style="margin-top: 1.25rem">
+          <h2>{contactPage.hoursTitle}</h2>
+          <ul class="hours-list">
+            {
+              contacts.hours.map((item) => (
+                <li>
+                  <span>{item.days}</span>
+                  <span>{item.time}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="contact-card">
+          <h2>{contactPage.socialTitle}</h2>
+          <ul class="social-list">
+            {
+              contacts.social.map((item) => (
+                <li>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">
+                    <Icon name={socialIcons[item.label] ?? 'heart'} size={20} />
+                    <span>
+                      {item.label}
+                      <span>{item.handle}</span>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <form
+        class="form-card"
+        id="forma"
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/diakuiemo/"
+        data-adoption-subject={contactPage.formSubjects[0]}
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="hidden-field">
+          <label>Не заповнюйте це поле: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+        </p>
+
+        <h2>{contactPage.formTitle}</h2>
+        <p class="form-intro">{contactPage.formText}</p>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="contact-name">{contactPage.form.name}</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="contact-email">{contactPage.form.email}</label>
+            <input id="contact-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="contact-phone">{contactPage.form.phone}</label>
+            <input id="contact-phone" name="phone" type="tel" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label for="contact-subject">{contactPage.form.subject}</label>
+            <select id="contact-subject" name="subject" required>
+              {
+                contactPage.formSubjects.map((subject) => (
+                  <option value={subject}>{subject}</option>
+                ))
+              }
+            </select>
+          </div>
+          <div class="field field--full">
+            <label for="contact-message">{contactPage.form.message}</label>
+            <textarea
+              id="contact-message"
+              name="message"
+              placeholder={contactPage.form.messagePlaceholder}
+              required
+            ></textarea>
+          </div>
+          <div class="field field--full">
+            <label class="checkbox">
+              <input type="checkbox" name="consent" value="yes" required />
+              <span>{contactPage.form.consent}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit">
+            {contactPage.form.submit}
+            <Icon name="arrow-right" size={18} />
+          </button>
+        </div>
+        <p class="form-note">{contactPage.formNote}</p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#forma');
+
+  if (form) {
+    const params = new URLSearchParams(window.location.search);
+    const animal = params.get('tvaryna');
+
+    if (animal) {
+      const subject = form.querySelector<HTMLSelectElement>('[name="subject"]');
+      const message = form.querySelector<HTMLTextAreaElement>('[name="message"]');
+      const adoptionSubject = form.dataset.adoptionSubject;
+
+      if (subject && adoptionSubject) subject.value = adoptionSubject;
+      if (message && !message.value) {
+        message.value = `Добрий день! Хочу дізнатися більше про кота на ім’я ${animal}.`;
+      }
+    }
+  }
+</script>

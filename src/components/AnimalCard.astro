@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { labels } from '../config';
+import { formatAge } from '../lib/format';
+
+interface Props {
+  animal: CollectionEntry<'animals'>;
+}
+
+const { animal } = Astro.props;
+const { name, status, sex, ageMonths, breed, summary, photos, traits } = animal.data;
+const href = `/tvaryny/${animal.id}/`;
+const sexLabel = labels.sex[sex];
+const statusLabel = labels.status[status];
+---
+
+<article class:list={['animal-card', `animal-card--${status}`]}>
+  <div class="animal-card-media">
+    <img
+      src={photos[0]}
+      alt={`${name} — ${breed.toLowerCase()}`}
+      width="800"
+      height="600"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class:list={['badge', `badge--${status}`]}>{statusLabel}</span>
+  </div>
+  <div class="animal-card-body">
+    <h3><a href={href}>{name}</a></h3>
+    <p class="animal-card-meta">{sexLabel} · {formatAge(ageMonths)}</p>
+    <p class="animal-card-summary">{summary}</p>
+    <ul class="traits" aria-label="Особливості">
+      {traits.slice(0, 4).map((trait) => <li class="trait">{trait}</li>)}
+    </ul>
+  </div>
+</article>

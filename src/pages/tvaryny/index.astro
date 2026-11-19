@@ -1,0 +1,214 @@
+---
+import { getCollection } from 'astro:content';
+import AnimalCard from '../../components/AnimalCard.astro';
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { labels, listingPage } from '../../config';
+import { ageGroup, statusOrder } from '../../lib/format';
+
+const animals = (await getCollection('animals')).sort(
+  (a, b) =>
+    statusOrder[a.data.status] - statusOrder[b.data.status] ||
+    a.data.name.localeCompare(b.data.name, 'uk'),
+);
+
+const statusFilters = [
+  { value: 'available', label: labels.status.available },
+  { value: 'reserved', label: labels.status.reserved },
+  { value: 'adopted', label: labels.status.adopted },
+];
+
+const sexFilters = [
+  { value: 'male', label: labels.sex.male },
+  { value: 'female', label: labels.sex.female },
+];
+
+const ageFilters = [
+  { value: 'kitten', label: labels.ageGroup.kitten },
+  { value: 'adult', label: labels.ageGroup.adult },
+  { value: 'senior', label: labels.ageGroup.senior },
+];
+---
+
+<Base title={listingPage.eyebrow} description={listingPage.text}>
+  <section class="page-hero">
+    <div class="container">
+      <span class="eyebrow">{listingPage.eyebrow}</span>
+      <h1>{listingPage.title}</h1>
+      <p class="page-hero-text">{listingPage.text}</p>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="filters">
+        <div class="filter-search">
+          <label for="cat-search">{listingPage.searchLabel}</label>
+          <div class="search-wrap">
+            <Icon name="search" size={18} />
+            <input
+              class="search-input"
+              id="cat-search"
+              type="search"
+              placeholder={listingPage.searchPlaceholder}
+              autocomplete="off"
+              data-search
+            />
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-title" id="filter-status-title">{listingPage.filters.status}</span>
+            <div class="filter-chips" role="group" aria-labelledby="filter-status-title">
+              <button class="filter-chip" type="button" data-filter="status" data-value="all" aria-pressed="true">
+                {listingPage.all}
+              </button>
+              {
+                statusFilters.map((item) => (
+                  <button class="filter-chip" type="button" data-filter="status" data-value={item.value} aria-pressed="false">
+                    {item.label}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-title" id="filter-sex-title">{listingPage.filters.sex}</span>
+            <div class="filter-chips" role="group" aria-labelledby="filter-sex-title">
+              <button class="filter-chip" type="button" data-filter="sex" data-value="all" aria-pressed="true">
+                {listingPage.all}
+              </button>
+              {
+                sexFilters.map((item) => (
+                  <button class="filter-chip" type="button" data-filter="sex" data-value={item.value} aria-pressed="false">
+                    {item.label}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-title" id="filter-age-title">{listingPage.filters.age}</span>
+            <div class="filter-chips" role="group" aria-labelledby="filter-age-title">
+              <button class="filter-chip" type="button" data-filter="age" data-value="all" aria-pressed="true">
+                {listingPage.all}
+              </button>
+              {
+                ageFilters.map((item) => (
+                  <button class="filter-chip" type="button" data-filter="age" data-value={item.value} aria-pressed="false">
+                    {item.label}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-toolbar">
+        <p class="results" aria-live="polite">
+          {listingPage.resultsPrefix} <strong data-results>{animals.length}</strong>
+        </p>
+        <button class="link-button" type="button" data-reset hidden>{listingPage.reset}</button>
+      </div>
+
+      <div class="animals-grid" data-grid>
+        {
+          animals.map((animal) => (
+            <div
+              class="animal-item"
+              data-animal
+              data-status={animal.data.status}
+              data-sex={animal.data.sex}
+              data-age={ageGroup(animal.data.ageMonths)}
+              data-name={animal.data.name.toLocaleLowerCase('uk-UA')}
+            >
+              <AnimalCard animal={animal} />
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="empty-state" data-empty hidden>
+        <p>{listingPage.empty}</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-animal]'));
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-chip'));
+  const search = document.querySelector<HTMLInputElement>('[data-search]');
+  const results = document.querySelector<HTMLElement>('[data-results]');
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  const reset = document.querySelector<HTMLButtonElement>('[data-reset]');
+
+  const state = {
+    status: 'all',
+    sex: 'all',
+    age: 'all',
+    query: '',
+  };
+
+  const isFiltered = () =>
+    state.status !== 'all' || state.sex !== 'all' || state.age !== 'all' || state.query !== '';
+
+  const applyFilters = () => {
+    let visible = 0;
+
+    for (const item of items) {
+      const matches =
+        (state.status === 'all' || item.dataset.status === state.status) &&
+        (state.sex === 'all' || item.dataset.sex === state.sex) &&
+        (state.age === 'all' || item.dataset.age === state.age) &&
+        (!state.query || (item.dataset.name ?? '').includes(state.query));
+
+      item.hidden = !matches;
+      if (matches) visible += 1;
+    }
+
+    if (results) results.textContent = String(visible);
+    if (empty) empty.hidden = visible > 0;
+    if (reset) reset.hidden = !isFiltered();
+  };
+
+  for (const chip of chips) {
+    chip.addEventListener('click', () => {
+      const group = chip.dataset.filter as 'status' | 'sex' | 'age' | undefined;
+      const value = chip.dataset.value;
+      if (!group || !value) return;
+
+      state[group] = value;
+      for (const sibling of chips) {
+        if (sibling.dataset.filter === group) {
+          sibling.setAttribute('aria-pressed', String(sibling === chip));
+        }
+      }
+      applyFilters();
+    });
+  }
+
+  search?.addEventListener('input', () => {
+    state.query = search.value.trim().toLocaleLowerCase('uk-UA');
+    applyFilters();
+  });
+
+  reset?.addEventListener('click', () => {
+    state.status = 'all';
+    state.sex = 'all';
+    state.age = 'all';
+    state.query = '';
+    if (search) search.value = '';
+
+    for (const chip of chips) {
+      chip.setAttribute('aria-pressed', String(chip.dataset.value === 'all'));
+    }
+    applyFilters();
+  });
+
+  applyFilters();
+</script>

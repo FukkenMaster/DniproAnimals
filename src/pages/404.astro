@@ -1,0 +1,23 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { notFoundPage, siteConfig } from '../config';
+---
+
+<Base title={notFoundPage.title} noindex>
+  <section class="message-page">
+    <div class="container">
+      <span class="eyebrow">{notFoundPage.eyebrow}</span>
+      <h1>{notFoundPage.title}</h1>
+      <p>{notFoundPage.text}</p>
+      <div class="message-actions">
+        <a class="btn btn--primary" href="/">
+          {notFoundPage.homeLabel}
+          <Icon name="arrow-right" size={18} />
+        </a>
+        <a class="btn btn--ghost" href="/tvaryny/">{notFoundPage.catsLabel}</a>
+      </div>
+      <p class="visually-hidden">{siteConfig.name}</p>
+    </div>
+  </section>
+</Base>

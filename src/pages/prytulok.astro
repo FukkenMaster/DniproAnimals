@@ -1,0 +1,63 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { about } from '../config';
+---
+
+<Base title="Про притулок" description={about.paragraphs[0]}>
+  <section class="page-hero">
+    <div class="container">
+      <span class="eyebrow">{about.eyebrow}</span>
+      <h1>{about.title}</h1>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="content-card prose-block">
+        {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <h2 style="margin-bottom: 1.5rem">{about.valuesTitle}</h2>
+      <div class="values-grid">
+        {
+          about.values.map((value, index) => (
+            <article class="value-card">
+              <span class="step-number" aria-hidden="true">{index + 1}</span>
+              <h3>{value.title}</h3>
+              <p>{value.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container split-grid">
+      <div class="content-card">
+        <h2>{about.helpTitle}</h2>
+        <p class="section-text" style="margin-top: 0; margin-bottom: 1.25rem">{about.helpText}</p>
+        <ul class="check-list">
+          {about.helpItems.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+      <div class="cta-banner" style="grid-template-columns: 1fr">
+        <div>
+          <h2>{about.cta.title}</h2>
+          <p>{about.cta.text}</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn--dark" href={about.cta.button.href}>
+            {about.cta.button.label}
+            <Icon name="arrow-right" size={18} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

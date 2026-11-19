@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import AnimalCard from '../components/AnimalCard.astro';
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { home } from '../config';
+import { statusOrder } from '../lib/format';
+
+const animals = await getCollection('animals');
+const available = animals
+  .filter((animal) => animal.data.status === 'available')
+  .sort(
+    (a, b) =>
+      Number(b.data.featured) - Number(a.data.featured) ||
+      statusOrder[a.data.status] - statusOrder[b.data.status] ||
+      +b.data.intakeDate - +a.data.intakeDate,
+  );
+const featured = available.slice(0, 6);
+---
+
+<Base>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow">{home.hero.eyebrow}</span>
+          <h1>{home.hero.title}</h1>
+          <p class="hero-text">{home.hero.text}</p>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href={home.hero.primaryCta.href}>
+              {home.hero.primaryCta.label}
+              <Icon name="arrow-right" size={18} />
+            </a>
+            <a class="btn btn--ghost" href={home.hero.secondaryCta.href}>
+              {home.hero.secondaryCta.label}
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-art">
+          <div class="hero-photo">
+            <img
+              src={home.hero.image}
+              alt={home.hero.imageAlt}
+              width="800"
+              height="600"
+              fetchpriority="high"
+            />
+          </div>
+          <p class="hero-note">
+            <span class="hero-note-icon"><Icon name="heart" size={16} /></span>
+            {home.hero.note}
+          </p>
+        </div>
+      </div>
+
+      <div class="stats">
+        {
+          home.stats.map((stat) => (
+            <div class="stat">
+              <span class="stat-value">{stat.value}</span>
+              <span class="stat-label">{stat.label}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">{home.featured.eyebrow}</span>
+          <h2>{home.featured.title}</h2>
+          <p class="section-text">{home.featured.text}</p>
+        </div>
+        <a class="section-link" href="/tvaryny/">
+          {home.featured.linkLabel}
+          <Icon name="arrow-right" size={18} />
+        </a>
+      </div>
+
+      <div class="animals-grid animals-grid--featured">
+        {featured.map((animal) => <AnimalCard animal={animal} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">{home.steps.eyebrow}</span>
+          <h2>{home.steps.title}</h2>
+        </div>
+      </div>
+      <ol class="steps-list">
+        {
+          home.steps.items.map((step, index) => (
+            <li class="step-card">
+              <span class="step-number" aria-hidden="true">{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="cta-banner">
+        <div>
+          <h2>{home.cta.title}</h2>
+          <p>{home.cta.text}</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn--dark" href={home.cta.primary.href}>
+            {home.cta.primary.label}
+            <Icon name="arrow-right" size={18} />
+          </a>
+          <a class="btn btn--ghost" href={home.cta.secondary.href}>{home.cta.secondary.label}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

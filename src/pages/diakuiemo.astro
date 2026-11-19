@@ -1,0 +1,22 @@
+---
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import { thankYouPage } from '../config';
+---
+
+<Base title={thankYouPage.title} description={thankYouPage.text} noindex>
+  <section class="message-page">
+    <div class="container">
+      <span class="eyebrow">{thankYouPage.eyebrow}</span>
+      <h1>{thankYouPage.title}</h1>
+      <p>{thankYouPage.text}</p>
+      <div class="message-actions">
+        <a class="btn btn--primary" href={thankYouPage.button.href}>
+          {thankYouPage.button.label}
+          <Icon name="arrow-right" size={18} />
+        </a>
+        <a class="btn btn--ghost" href="/">{thankYouPage.homeLabel}</a>
+      </div>
+    </div>
+  </section>
+</Base>

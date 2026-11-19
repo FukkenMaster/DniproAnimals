@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { contacts, siteConfig, theme } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const { title, description = siteConfig.description, noindex = false } = Astro.props;
+const pageTitle = title ? `${title} — ${siteConfig.shortName}` : siteConfig.name;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? siteConfig.url).href;
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AnimalShelter',
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  telephone: contacts.phone,
+  email: contacts.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: contacts.addressLines[0],
+    addressLocality: contacts.addressLines[1],
+    addressCountry: 'UA',
+  },
+  sameAs: contacts.social.map((item) => item.url),
+};
+---
+
+<!doctype html>
+<html
+  lang="uk"
+  style={`--orange: ${theme.orange}; --yellow: ${theme.yellow}; --green: ${theme.green}; --bg: ${theme.background};`}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="theme-color" content={theme.orange} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={siteConfig.locale} />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Перейти до вмісту</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
